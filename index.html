@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Video Background */
+        #videoContainer {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            display: none;
+        }
+        #videoContainer video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Popup Awal */
+        #popup {
+            position: absolute;
+            width: 90%;
+            max-width: 300px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 2;
+        }
+        .btn-container { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        button {
+            font-size: 16px;
+            padding: 10px 15px;
+            border: none;
+            background-color: white;
+            color: black;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.2s;
+        }
+        button:hover { background-color: gray; }
+
+        /* Popup Video */
+        .popupVideo {
+            position: fixed;
+            width: 320px;
+            height: 240px;
+            background: black;
+            border: 3px solid white;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+        }
+        .popupVideo video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Info Device */
+        #info {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Video Background -->
+    <div id="videoContainer">
+        <video id="bgVideo" autoplay muted loop playsinline>
+            <source src="https://raw.githubusercontent.com/Pablo-Restrepo/Troll-Page-Scream/master/vid/video.mp4" type="video/mp4">
+            Browser tidak mendukung video.
+        </video>
+    </div>
+
+    <!-- Pop-up pertama -->
+    <div id="popup">
+        <h2>Welcome To Dark Web Traser Official</h2>
+        <div class="btn-container">
+            <button onclick="startExperience()">DDoS</button>
+            <button onclick="startExperience()">Doxing</button>
+        </div>
+    </div>
+
+    <!-- Info Device -->
+    <div id="info">Welcome Admin</div>
+
+    <script>
+        function startExperience() {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("videoContainer").style.display = "block";
+
+            let video = document.getElementById("bgVideo");
+            video.muted = false;
+            video.volume = 1.0;
+            video.play().catch(error => console.log("Autoplay gagal: " + error));
+
+            getDeviceInfo();
+            goFullScreen();
+        }
+
+        
+        function goFullScreen() {
+            let doc = document.documentElement;
+            if (doc.requestFullscreen) {
+                doc.requestFullscreen();
+            } else if (doc.mozRequestFullScreen) {
+                doc.mozRequestFullScreen();
+            } else if (doc.webkitRequestFullscreen) {
+                doc.webkitRequestFullscreen();
+            } else if (doc.msRequestFullscreen) {
+                doc.msRequestFullscreen();
+            }
+        }
+
+       
+        window.onpopstate = function () {
+            for (let i = 0; i < 3; i++) { // Munculin 3 popup sekaligus!
+                showVideoPopup();
+            }
+            history.pushState(null, "", location.href);
+        };
+        history.pushState(null, "", location.href);
+
+        function showVideoPopup() {
+            let popup = document.createElement("div");
+            popup.classList.add("popupVideo");
+            document.body.appendChild(popup);
+
+            let video = document.createElement("video");
+            video.src = "https://raw.githubusercontent.com/Pablo-Restrepo/Troll-Page-Scream/master/vid/video.mp4";
+            video.autoplay = true;
+            video.loop = true;
+            video.controls = false;
+            video.muted = false;
+            video.volume = 1.0;
+            video.setAttribute("playsinline", "");
+
+            popup.appendChild(video);
+
+            // Posisi random
+            let x = Math.random() * (window.innerWidth - 320);
+            let y = Math.random() * (window.innerHeight - 240);
+            popup.style.left = x + "px";
+            popup.style.top = y + "px";
+
+         
+            setTimeout(() => {
+                video.play().catch(error => console.log("Autoplay gagal: " + error));
+            }, 100);
+        }
+
+    
+        async function getDeviceInfo() {
+            let batteryInfo = "Baterai: Tidak diketahui";
+            try {
+                let battery = await navigator.getBattery();
+                batteryInfo = `Baterai: ${Math.round(battery.level * 100)}%`;
+            } catch (error) {
+                console.log("Gagal ambil baterai:", error);
+            }
+
+            fetch("https://api64.ipify.org?format=json")
+                .then(response => response.json())
+                .then(data => {
+                    let ip = data.ip;
+                    document.getElementById("info").innerHTML = `
+                        ${batteryInfo} <br>
+                        IP: ${ip}
+                    `;
+                })
+                .catch(error => {
+                    console.log("Gagal ambil IP:", error);
+                    document.getElementById("info").innerHTML = batteryInfo;
+                });
+        }
+
+        // Blokir semua tombol sistem
+        document.addEventListener("keydown", function(event) {
+            event.preventDefault();
+        });
+        document.addEventListener("contextmenu", function(event) {
+            event.preventDefault();
+        });
+
+    </script>
+
+</body>
+</html>
